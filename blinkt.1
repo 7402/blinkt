@@ -1,0 +1,224 @@
+.TH blinkt 1
+
+.SH NAME
+blinkt \- controls the LEDs on the Blinkt! board for Raspberry Pi
+
+.SH SYNOPSIS
+.nf
+\fBblinkt\fR [\fISELECT\fR] \fICOLOR\fR
+\fBblinkt\fR [\fISELECT\fR] \fBrgb\fR \fIRED\fR \fIGREEN\fR \fIBLUE\fR
+\fBblinkt\fR \fBbright\fR \fIBRIGHTNESS\fR
+\fBblinkt\fR \fBclear\fR
+\fBblinkt\fR \fBdelay\fR \fIMILLISECONDS\fR
+\fBblinkt\fR (\fBleft\fR | \fBright\fR)
+\fBblinkt\fR (\fBoff\fR | \fBon\fR)
+\fBblinkt\fR (\fBhold\fR | \fBshow\fR)
+\fBblinkt\fR \fBrotate\fR (\fBleft\fR | \fBright\fR | \fBin\fR | \fBout\fR)
+\fBblinkt\fR \fBbinary\fR (\fBoff\fR | \fIMASK\fR)
+\fBblinkt\fR \fBstate\fR
+\fBblinkt\fR (\fBhelp\fR | \fBversion\fR | \fBlicense\fR | \fBman\-page\fR)
+.fi
+
+.SH DESCRIPTION
+This tool controls the LEDs on the Blinkt! add\-on board for the Raspberry Pi. The board has eight
+pixels, each of which is a combined red, green, and blue LED. The light from each pixel is
+determined by the separate red, green, and blue intensities from 0 to 255, combined with an overall
+brightness setting for each pixel from 0 to 31.
+
+The blinkt tool also allows RGB values to be specified by one of 12 predefined color names. The
+color names are approximate; actual appearance may vary according to the brightness and
+individual variations in boards and LEDs.
+
+.SH OPTIONS
+
+.TP
+.BR \fICOLOR\fR
+One of: red coral orange gold yellow lime green aqua blue purple pink white.
+
+.TP
+.BR \fISELECT\fR
+Binary pattern showing LEDs affected (00000000 to 11111111). To identify a specific
+pixel by number, use p0, p1, p2, etc. Default is all LEDs (11111111).
+
+.TP
+.BR rgb
+Set color by specifying separate red, green, and blue LED intensities.
+
+.TP
+.BR \fIRED\fR
+Red LED intensity, 0-255. Default is 0.
+
+.TP
+.BR \fIGREEN\fR
+Green LED intensity, 0-255. Default is 0.
+
+.TP
+.BR \fIBLUE\fR
+Blue LED intensity, 0-255. Default is 0.
+
+.TP
+.BR bright
+Set brightness factor.
+
+.TP
+.BR \fIBRIGHTNESS\fR
+Brightness factor, 0-31. Default is 7.
+
+.TP
+.BR clear
+Set RGB to 0 0 0 and brightness to 7 for all LEDs. Turn off holding and binary mode.
+
+.TP
+.BR delay
+Sleep for specified time.
+
+.TP
+.BR \fIMILLISECONDS\fR
+Number of milliseconds to sleep.
+
+.TP
+.BR left " | " right
+Set numbering orientation for LEDs. If "Blinkt!" on circuit board is rightside up, choose left
+(left\-to\-right). If "Blinkt!" on circuit board is upside down, choose right (right\-to\-left).
+
+.TP
+.BR off " | " on
+Turn all LEDs off, or turn LEDs back on to their previous settings (before they were turned off).
+
+.TP
+.BR hold " | " show
+The "blinkt hold" command causes changes made by subsequent commands to be saved but not displayed.
+The "blinkt show" command causes all saved commands to be shown, and subsequent commands to be
+shown immediately.
+
+.TP
+.BR rotate
+Rotate the pattern of LED colors.
+
+.TP
+.BR left " | " right " | " in " | " out
+Rotation pattern of LEDs.
+
+.TP
+.BR binary
+Turn LEDs on or off to display a number as a binary pattern.
+Does not affect color or brightness settings.
+
+.TP
+.BR off " | " \fIMASK\fR
+Decimal number (0-255) to display as binary in LEDs. Specify "off" to exit binary mode.
+
+.TP
+.BR state
+Print out state of LEDs.
+
+.TP
+.BR help
+Show help message.
+
+.TP
+.BR version
+Show version.
+
+.TP
+.BR license
+Show software copyright and license.
+
+.TP
+.BR man-page
+Show source for this man page
+
+.SH EXAMPLES
+Clear LEDs:
+.PP
+.nf
+.RS
+\fBblinkt clear\fR
+.RE
+.fi
+.PP
+
+Turn on all LEDs green at brightness 1:
+.PP
+.nf
+.RS
+\fBblinkt green\fR
+\fBblinkt bright 1\fR
+.RE
+.fi
+.PP
+
+Turn on left 4 LEDs blue and right 4 LEDs red:
+.PP
+.nf
+.RS
+\fBblinkt 11110000 blue\fR
+\fBblinkt 00001111 red\fR
+.RE
+.fi
+.PP
+
+Rotate LED in pink from left to right:
+.PP
+.nf
+.RS
+\fBblinkt clear\fR
+\fBblinkt 10000000 pink\fR
+\fBblinkt delay 200\fR
+\fBblinkt rotate right\fR
+\fBblinkt delay 200\fR
+\fBblinkt rotate right\fR
+\fBblinkt delay 200\fR
+\fBblinkt rotate right\fR
+\fBblinkt delay 200\fR
+\fBblinkt rotate right\fR
+\fBblinkt delay 200\fR
+\fBblinkt rotate right\fR
+\fBblinkt delay 200\fR
+\fBblinkt rotate right\fR
+\fBblinkt delay 200\fR
+\fBblinkt rotate right\fR
+\fBblinkt delay 200\fR
+\fBblinkt clear\fR
+.RE
+.fi
+.PP
+
+Count in binary from 1 to 7:
+.PP
+.nf
+.RS
+\fBblinkt clear\fR
+\fBblinkt binary 1\fR
+\fBblinkt yellow\fR
+\fBblinkt delay 700\fR
+\fBblinkt binary 2\fR
+\fBblinkt delay 700\fR
+\fBblinkt binary 3\fR
+\fBblinkt delay 700\fR
+\fBblinkt binary 4\fR
+\fBblinkt delay 700\fR
+\fBblinkt binary 5\fR
+\fBblinkt delay 700\fR
+\fBblinkt binary 6\fR
+\fBblinkt delay 700\fR
+\fBblinkt binary 7\fR
+\fBblinkt delay 700\fR
+\fBblinkt clear\fR
+.RE
+.fi
+.PP
+
+.SH NOTES
+The Blinkt! board is manufactured by Pimoroni in the UK
+<\fIhttps://shop.pimoroni.com/products/blinkt\fR>.
+Available in the US from Adafruit <\fIhttps://www.adafruit.com/product/3195\fR>.
+
+After each invocation of the tool, the LED state is saved in the file \fI~/.blinkt\fR
+
+To use number bases other than the default, preceed numbers by b for binary, d for
+decimal, x for hexadecimal. To use a number corresponding to a specific pixel, use
+p0, p1, p2, etc.
+
+.SH AUTHOR
+Michael Budiansky \fIhttps://www.7402.org/email\fR
