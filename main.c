@@ -43,7 +43,7 @@ struct Color {
 };
 typedef struct Color Color;
 
-#define FILE_NAME ".blink"
+#define FILE_NAME ".blinkt"
 
 int main(int argc, const char * argv[]) {
     Pixel pixels[NUM_PIXELS];
