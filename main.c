@@ -62,6 +62,7 @@ int main(int argc, const char * argv[]) {
     init_state(&flags, pixels);
 
     // make path to state file
+    if (home == NULL || strlen(home) == 0) home = "/tmp";
     path = malloc(strlen(home) + strlen("/") + strlen(FILE_NAME) + 1);
     if (path != NULL) {
         strcpy(path, home);
