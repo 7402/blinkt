@@ -14,7 +14,7 @@ blinkt \- controls the LEDs on the Blinkt! board for Raspberry Pi
 \fBblinkt\fR (\fBoff\fR | \fBon\fR)
 \fBblinkt\fR (\fBhold\fR | \fBshow\fR)
 \fBblinkt\fR \fBrotate\fR (\fBleft\fR | \fBright\fR | \fBin\fR | \fBout\fR)
-\fBblinkt\fR \fBbinary\fR (\fBoff\fR | \fIMASK\fR)
+\fBblinkt\fR [\fISELECT\fR] \fBbinary\fR (\fBoff\fR | \fIMASK\fR)
 \fBblinkt\fR \fBstate\fR
 \fBblinkt\fR (\fBhelp\fR | \fBversion\fR | \fBlicense\fR | \fBman\-page\fR)
 .fi
@@ -33,7 +33,7 @@ individual variations in boards and LEDs.
 
 .TP
 .BR \fICOLOR\fR
-One of: red coral orange gold yellow lime green aqua blue purple pink white.
+One of: red coral orange gold yellow lime green aqua blue purple pink white black.
 
 .TP
 .BR \fISELECT\fR
@@ -214,7 +214,7 @@ The Blinkt! board is manufactured by Pimoroni in the UK
 <\fIhttps://shop.pimoroni.com/products/blinkt\fR>.
 Available in the US from Adafruit <\fIhttps://www.adafruit.com/product/3195\fR>.
 
-After each invocation of the tool, the LED state is saved in the file \fI~/.blinkt\fR
+After each invocation of the tool, the LED state is saved in the file \fI/usr/local/share/blinkt\fR
 
 To use number bases other than the default, preceed numbers by b for binary, d for
 decimal, x for hexadecimal. To use a number corresponding to a specific pixel, use

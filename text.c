@@ -31,7 +31,7 @@
 
 void version(void)
 {
-    printf("blinkt 0.1\n");
+    printf("blinkt 0.2\n");
 }
 
 void usage(void)
@@ -55,6 +55,7 @@ void usage(void)
            "  blinkt rotate <left | right | in | out>\n"
            "\n"
            "  blinkt binary <mask>\n"
+           "  blinkt <select> binary <mask>\n"
            "  blinkt binary off\n"
            "\n"
            "  blinkt state\n"
@@ -122,7 +123,7 @@ void man_page_source(void)
            "\\fBblinkt\\fR (\\fBoff\\fR | \\fBon\\fR)\n"
            "\\fBblinkt\\fR (\\fBhold\\fR | \\fBshow\\fR)\n"
            "\\fBblinkt\\fR \\fBrotate\\fR (\\fBleft\\fR | \\fBright\\fR | \\fBin\\fR | \\fBout\\fR)\n"
-           "\\fBblinkt\\fR \\fBbinary\\fR (\\fBoff\\fR | \\fIMASK\\fR)\n"
+           "\\fBblinkt\\fR [\\fISELECT\\fR] \\fBbinary\\fR (\\fBoff\\fR | \\fIMASK\\fR)\n"
            "\\fBblinkt\\fR \\fBstate\\fR\n"
            "\\fBblinkt\\fR (\\fBhelp\\fR | \\fBversion\\fR | \\fBlicense\\fR | \\fBman\\-page\\fR)\n"
            ".fi\n"
@@ -141,7 +142,7 @@ void man_page_source(void)
            "\n"
            ".TP\n"
            ".BR \\fICOLOR\\fR\n"
-           "One of: red coral orange gold yellow lime green aqua blue purple pink white.\n"
+           "One of: red coral orange gold yellow lime green aqua blue purple pink white black.\n"
            "\n"
            ".TP\n"
            ".BR \\fISELECT\\fR\n"
@@ -322,7 +323,8 @@ void man_page_source(void)
            "<\\fIhttps://shop.pimoroni.com/products/blinkt\\fR>.\n"
            "Available in the US from Adafruit <\\fIhttps://www.adafruit.com/product/3195\\fR>.\n"
            "\n"
-           "After each invocation of the tool, the LED state is saved in the file \\fI~/.blinkt\\fR\n"
+           "After each invocation of the tool, the LED state is saved in the file "
+           "\\fI/usr/local/share/blinkt\\fR\n"
            "\n"
            "To use number bases other than the default, preceed numbers by b for binary, d for\n"
            "decimal, x for hexadecimal. To use a number corresponding to a specific pixel, use\n"

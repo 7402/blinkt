@@ -24,6 +24,7 @@
 // WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -159,6 +160,34 @@ void write_to_blinkt(Flags flags, Pixel pixels[NUM_PIXELS])
 
     // end frame
     send_clocks(36);
+}
+
+bool is_num_arg(const char *arg)
+{
+    bool result = false;
+
+    if (isdigit(arg[0])) {
+        result = true;
+
+    } else if (strlen(arg) > 1) {
+        char c = arg[1];
+        switch (arg[0]) {
+            case 'b':
+                result = c == '0' || c == '1';
+                break;
+            case 'd':
+                result = isdigit(c);
+                break;
+            case 'x':
+                result = isdigit(c) || (c >= 'A' && c <= 'F') ||  (c >= 'a' && c <= 'f');
+                break;
+            case 'p':
+                result = c >= '0' && c <= '7';
+                break;
+        }
+    }
+
+    return result;
 }
 
 // convert string to number using default base.

@@ -61,6 +61,7 @@ void write_state_file(const char *path, Flags flags, Pixel pixels[NUM_PIXELS]);
 void write_to_blinkt(Flags flags, Pixel pixels[NUM_PIXELS]);
 
 // utility functions
+bool is_num_arg(const char *arg);
 uint8_t parse_num(const char *arg, int default_base);
 void clear_pixels(Pixel pixels[NUM_PIXELS]);
 uint8_t swap_bits(uint8_t x);

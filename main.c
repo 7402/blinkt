@@ -43,13 +43,11 @@ struct Color {
 };
 typedef struct Color Color;
 
-#define FILE_NAME ".blinkt"
+#define FILE_PATH "/usr/local/share/blinkt"
 
 int main(int argc, const char * argv[]) {
     Pixel pixels[NUM_PIXELS];
     Flags flags;
-    char *home = getenv("HOME");
-    char *path = NULL;
     int k;
     int next_arg = 1;
     uint8_t select_mask = 0xFF; // default is to change all pixels
@@ -61,21 +59,11 @@ int main(int argc, const char * argv[]) {
     // initialize data structures
     init_state(&flags, pixels);
 
-    // make path to state file
-    if (home == NULL || strlen(home) == 0) home = "/tmp";
-    path = malloc(strlen(home) + strlen("/") + strlen(FILE_NAME) + 1);
-    if (path != NULL) {
-        strcpy(path, home);
-        strcat(path, "/");
-        strcat(path, FILE_NAME);
-    }
-
     // read state file if present; OK if does not exist
-    read_state_file(path, &flags, pixels);
+    read_state_file(FILE_PATH, &flags, pixels);
 
-    // read selection option, if present (either a number or a number preceeded by one letter)
-    if (next_arg < argc && (isdigit(argv[next_arg][0]) ||
-                            (argv[next_arg][0] != '\0' && isdigit(argv[next_arg][1])))) {
+    // read selection option, if present
+    if (next_arg < argc && is_num_arg(argv[next_arg])) {
         select_mask = parse_num(argv[next_arg], 2);
         if (flags.left_to_right) select_mask = swap_bits(select_mask);
         next_arg++;
@@ -155,6 +143,7 @@ int main(int argc, const char * argv[]) {
                     flags.binary_on = true;
                     flags.binary_mask = parse_num(argv[next_arg], 10);
                     if (flags.left_to_right) flags.binary_mask = swap_bits(flags.binary_mask);
+                    flags.binary_mask |= ~select_mask;
                 }
             }
 
@@ -306,6 +295,7 @@ int main(int argc, const char * argv[]) {
                 {"purple",     72,      0,    120},
                 {"pink",      220,      0,     40},
                 {"white",     255,    255,    255},
+                {"black",       0,      0,      0},
             };
 
             int num_colors = sizeof(colors) / sizeof(Color);
@@ -346,7 +336,7 @@ int main(int argc, const char * argv[]) {
     }
 
     if (state_changed) {
-        write_state_file(path, flags, pixels);
+        write_state_file(FILE_PATH, flags, pixels);
     }
 
     return 0;

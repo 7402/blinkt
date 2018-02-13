@@ -14,6 +14,8 @@ blinkt : main.c blinkt.c blinkt.h text.c text.h
 	gcc $(CFLAGS) -o blinkt main.c blinkt.c text.c $(LINK_LIBS)
 
 install : blinkt
+	chown :staff blinkt
+	chmod g+s blinkt
 	cp blinkt $(BINDIR)/
 	mkdir -p $(MANDIR)
 	cp blinkt.1 $(MANDIR)/
