@@ -1,5 +1,6 @@
 CFLAGS=-Wall -std=c99
 BINDIR=/usr/local/bin
+FILEDIR=/usr/local/share
 MANDIR=/usr/local/share/man/man1
 
 UNAME_S := $(shell uname -s)
@@ -14,9 +15,9 @@ blinkt : main.c blinkt.c blinkt.h text.c text.h
 	gcc $(CFLAGS) -o blinkt main.c blinkt.c text.c $(LINK_LIBS)
 
 install : blinkt
-	chown :staff blinkt
-	chmod g+s blinkt
 	cp blinkt $(BINDIR)/
+	chown :staff $(BINDIR)/blinkt
+	chmod g+s $(BINDIR)/blinkt
 	mkdir -p $(MANDIR)
 	cp blinkt.1 $(MANDIR)/
 
@@ -24,4 +25,4 @@ clean :
 	rm -f blinkt *.o
 
 distclean :
-	rm -f blinkt *.o $(BINDIR)/blinkt $(MANDIR)/blinkt.1
+	rm -f blinkt *.o $(BINDIR)/blinkt $(FILEDIR)/blinkt $(MANDIR)/blinkt.1

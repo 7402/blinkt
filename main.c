@@ -46,12 +46,13 @@ typedef struct Color Color;
 #define FILE_PATH "/usr/local/share/blinkt"
 
 int main(int argc, const char * argv[]) {
+    Pixel previous_pixels[NUM_PIXELS];
+    Flags previous_flags;
     Pixel pixels[NUM_PIXELS];
     Flags flags;
     int k;
     int next_arg = 1;
     uint8_t select_mask = 0xFF; // default is to change all pixels
-    bool state_changed = true;
 
     // intialize GPIO library and pins
     init_gpio();
@@ -61,6 +62,8 @@ int main(int argc, const char * argv[]) {
 
     // read state file if present; OK if does not exist
     read_state_file(FILE_PATH, &flags, pixels);
+
+    copy_state(&flags, pixels, &previous_flags, previous_pixels);
 
     // read selection option, if present
     if (next_arg < argc && is_num_arg(argv[next_arg])) {
@@ -152,8 +155,6 @@ int main(int argc, const char * argv[]) {
                 int msec = atoi(argv[next_arg]);
                 sleep_msec(msec);
             }
-
-            state_changed = false;
 
         } else if (strcmp(argv[next_arg], "rotate") == 0) {
             if (++next_arg < argc) {
@@ -260,23 +261,17 @@ int main(int argc, const char * argv[]) {
                        pixels[k].blue);
             }
 
-            state_changed = false;
-
         } else if (strcmp(argv[next_arg], "version") == 0) {
             version();
-            state_changed = false;
 
         } else if (strcmp(argv[next_arg], "help") == 0) {
             usage();
-            state_changed = false;
 
         } else if (strcmp(argv[next_arg], "man-page") == 0) {
             man_page_source();
-            state_changed = false;
 
         } else if (strcmp(argv[next_arg], "license") == 0) {
             license();
-            state_changed = false;
 
         } else {
             // set RGB by named color
@@ -321,21 +316,19 @@ int main(int argc, const char * argv[]) {
 
             } else {
                 fprintf(stderr, "Unknown option\n");
-                state_changed = false;
             }
         }
 
     } else {
         // if no options, print help
         usage();
-        state_changed = false;
     }
 
-    if (state_changed && !flags.holding) {
-        write_to_blinkt(flags, pixels);
-    }
+    if (!states_are_same(&previous_flags, previous_pixels, &flags, pixels)) {
+        if (!flags.holding) {
+            write_to_blinkt(flags, pixels);
+        }
 
-    if (state_changed) {
         write_state_file(FILE_PATH, flags, pixels);
     }
 

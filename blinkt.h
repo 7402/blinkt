@@ -53,6 +53,12 @@ typedef struct Flags Flags;
 void init_gpio(void);
 void init_state(Flags *flags, Pixel pixels[NUM_PIXELS]);
 
+// state functions
+void copy_state(const Flags *from_flags, const Pixel from_pixels[NUM_PIXELS],
+                Flags *to_flags, Pixel to_pixels[NUM_PIXELS]);
+bool states_are_same(Flags *flags1, Pixel pixels1[NUM_PIXELS],
+                     Flags *flags2, Pixel pixels2[NUM_PIXELS]);
+
 // file functions
 void read_state_file(const char *path, Flags *flags, Pixel pixels[NUM_PIXELS]);
 void write_state_file(const char *path, Flags flags, Pixel pixels[NUM_PIXELS]);

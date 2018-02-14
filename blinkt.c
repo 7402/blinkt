@@ -30,6 +30,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "blinkt.h"
 
 // buffer size for file I/O
@@ -67,6 +70,39 @@ void init_state(Flags *flags, Pixel pixels[NUM_PIXELS])
     flags->binary_on = false;
     flags->binary_mask = 0xFF;
     clear_pixels(pixels);
+}
+
+void copy_state(const Flags *from_flags, const Pixel from_pixels[NUM_PIXELS],
+                Flags *to_flags, Pixel to_pixels[NUM_PIXELS])
+{
+    int k;
+
+    *to_flags = *from_flags;
+    for (k = 0; k < NUM_PIXELS; k++) {
+        to_pixels[k] = from_pixels[k];
+    }
+}
+
+bool states_are_same(Flags *flags1, Pixel pixels1[NUM_PIXELS],
+                     Flags *flags2, Pixel pixels2[NUM_PIXELS])
+{
+    int k;
+    bool same =
+        flags1->left_to_right == flags2->left_to_right &&
+        flags1->leds_on == flags2->leds_on &&
+        flags1->holding == flags2->holding &&
+        flags1->binary_on == flags2->binary_on &&
+        flags1->binary_mask == flags2->binary_mask;
+
+    for (k = 0; k < NUM_PIXELS && same; k++) {
+        same =
+            pixels1[k].red == pixels2[k].red &&
+            pixels1[k].green == pixels2[k].green &&
+            pixels1[k].blue == pixels2[k].blue &&
+            pixels1[k].brightness == pixels2[k].brightness;
+    }
+
+    return same;
 }
 
 // read flags and pixels from state file, if it exists
@@ -115,29 +151,37 @@ void read_state_file(const char *path, Flags *flags, Pixel pixels[NUM_PIXELS])
 // write flags and pixels to state file
 void write_state_file(const char *path, Flags flags, Pixel pixels[NUM_PIXELS])
 {
-    FILE *file = fopen(path, "w");
+    FILE *file = NULL;
+
+    umask(0002);
+    file = fopen(path, "w");
 
     if (file == NULL) {
-        fprintf(stderr, "Unable to open ~/.blink for writing\n");
+        fprintf(stderr, "Unable to open %s for writing\n", path);
 
     } else {
+        bool error = false;
         int k;
 
-        fprintf(file, "%s\n", flags.left_to_right ? "left" : "right");
-        fprintf(file, "%s\n", flags.leds_on ? "on" : "off");
-        fprintf(file, "%s\n", flags.holding ? "on" : "off");
-        fprintf(file, "%s\n", flags.binary_on ? "on" : "off");
-        fprintf(file, "%d\n", flags.binary_mask);
-        for (k = 0; k < NUM_PIXELS; k++) {
-            fprintf(file, "%d %d %d %d\n",
+        if (!error) error = fprintf(file, "%s\n", flags.left_to_right ? "left" : "right") < 0;
+        if (!error) error = fprintf(file, "%s\n", flags.leds_on ? "on" : "off") < 0;
+        if (!error) error = fprintf(file, "%s\n", flags.holding ? "on" : "off") < 0;
+        if (!error) error = fprintf(file, "%s\n", flags.binary_on ? "on" : "off") < 0;
+        if (!error) error = fprintf(file, "%d\n", flags.binary_mask) < 0;
+        for (k = 0; k < NUM_PIXELS && !error; k++) {
+            if (!error) error = fprintf(file, "%d %d %d %d\n",
                     pixels[k].brightness,
                     pixels[k].blue,
                     pixels[k].green,
-                    pixels[k].red);
+                    pixels[k].red) < 0;
         }
 
         fclose(file);
         file = NULL;
+
+        if (error) {
+            fprintf(stderr, "Unable to write to %s\n", path);
+        }
     }
 }
 
