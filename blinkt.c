@@ -325,6 +325,7 @@ void send_byte(uint8_t x)
         }
 
         digitalWrite(CLK, 1);
+        delay(0);
         digitalWrite(CLK, 0);
         x = x << 1;
     }
