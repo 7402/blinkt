@@ -331,6 +331,8 @@ int main(int argc, const char * argv[]) {
 
         write_state_file(FILE_PATH, flags, pixels);
     }
+    
+    close_gpio();
 
     return 0;
 }

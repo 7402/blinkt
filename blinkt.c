@@ -30,6 +30,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#define __USE_POSIX199309 1
+#include <time.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -39,7 +42,8 @@
 #define LINE_SIZE 256
 
 #ifdef __linux__
-#include <wiringPi.h>
+// see http://abyz.me.uk/rpi/pigpio/
+#include <pigpiod_if2.h>
 
 // GPIO pin assignments
 #define DAT 23
@@ -48,17 +52,41 @@
 bool data_state;    // current state of data pin
 #endif
 
+// void gpio_result(int value);
+// void gpio_result(int value)
+// {
+// 	switch (value) {
+// 		case 0:				fprintf(stderr, "OK\n");			break;
+// 		case PI_BAD_GPIO:	fprintf(stderr, "PI_BAD_GPIO\n");	break;
+// 		case PI_BAD_MODE:	fprintf(stderr, "PI_BAD_MODE\n");	break;
+// 		case PI_BAD_LEVEL:	fprintf(stderr, "PI_BAD_LEVEL\n");	break;
+// 		default:			fprintf(stderr, "[%d]\n", value);	break;
+// 	}
+// }
+
 // intialize GPIO library and pins
+int pi = -1;
+
 void init_gpio(void)
 {
 #ifdef __linux__
-    wiringPiSetupGpio();
-    pinMode(DAT, OUTPUT);
-    pinMode(CLK, OUTPUT);
+	pi = pigpio_start(NULL, NULL);
+    if (pi < 0) {
+    	fprintf(stderr, "unable to connect to pigpiod\n");
+    	exit(1);
+    }
+    
+    set_mode(pi, DAT, PI_OUTPUT);
+    set_mode(pi, CLK, PI_OUTPUT);
 
-    digitalWrite(DAT, 0);
+    gpio_write(pi, DAT, 0);
     data_state = false;
 #endif
+}
+
+void close_gpio(void)
+{
+	pigpio_stop(pi);
 }
 
 // initialize flags and pixels
@@ -305,7 +333,10 @@ void clear_pixels(Pixel pixels[NUM_PIXELS])
 void sleep_msec(int msec)
 {
 #ifdef __linux__
-    delay(msec);
+	struct timespec ts;
+	ts.tv_sec = msec / 1000;
+	ts.tv_nsec = (msec % 1000) * 1000000L;
+    nanosleep(&ts, NULL);
 #else
     usleep(1000L * msec);
 #endif
@@ -320,12 +351,12 @@ void send_byte(uint8_t x)
         bool new_state = (x & 0b10000000) != 0;
         if (data_state != new_state) {
             // only send to data pin if value has changed
-            digitalWrite(DAT, new_state);
+            gpio_write(pi, DAT, new_state);
             data_state = new_state;
         }
 
-        digitalWrite(CLK, 1);
-        digitalWrite(CLK, 0);
+        gpio_write(pi, CLK, 1);
+        gpio_write(pi, CLK, 0);
         x = x << 1;
     }
 #endif
@@ -336,10 +367,10 @@ void send_clocks(int count)
 {
 #ifdef __linux__
     int i;
-    digitalWrite(DAT, 0);
+    gpio_write(pi, DAT, 0);
     for (i = 0; i < count; i++) {
-        digitalWrite(CLK, 1);
-        digitalWrite(CLK, 0);
+        gpio_write(pi, CLK, 1);
+        gpio_write(pi, CLK, 0);
     }
 #endif
 }

@@ -2,7 +2,7 @@
 // text.c
 // blinkt
 //
-// Copyright (C) 2018 Michael Budiansky. All rights reserved.
+// Copyright (C) 2022 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -31,7 +31,7 @@
 
 void version(void)
 {
-    printf("blinkt 0.2\n");
+    printf("blinkt 0.3\n");
 }
 
 void usage(void)
@@ -78,7 +78,7 @@ void usage(void)
 
 void license(void)
 {
-    printf("Copyright (C) 2018 Michael Budiansky. All rights reserved.\n"
+    printf("Copyright (C) 2022 Michael Budiansky. All rights reserved.\n"
            "\n"
            "Redistribution and use in source and binary forms, with or without modification, are permitted\n"
            "provided that the following conditions are met:\n"

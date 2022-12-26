@@ -46,15 +46,16 @@ For more information, see man page.
 
 ### Build and install
 
-* Raspbian Stretch
+* Raspbian Bullseye
 
 ```
-sudo apt-get install git
-sudo apt-get install wiringpi
+sudo apt install git
+sudo aptt install pigpio
 git clone git://github.com/7402/blinkt
 cd blinkt
 make
 sudo make install
+sudo pigpiod
 ```
 
 ### Notes
