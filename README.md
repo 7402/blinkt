@@ -51,7 +51,7 @@ For more information, see man page.
 ```
 sudo apt install git
 sudo apt install pigpio
-git clone git://github.com/7402/blinkt
+git clone https://github.com/7402/blinkt.git
 cd blinkt
 make
 sudo make install
