@@ -50,7 +50,7 @@ For more information, see man page.
 
 ```
 sudo apt install git
-sudo aptt install pigpio
+sudo apt install pigpio
 git clone git://github.com/7402/blinkt
 cd blinkt
 make
