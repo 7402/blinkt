@@ -20,6 +20,8 @@ install : blinkt
 	chmod g+s $(BINDIR)/blinkt
 	mkdir -p $(MANDIR)
 	cp blinkt.1 $(MANDIR)/
+	touch /usr/local/share/blinkt
+	chmod 666 /usr/local/share/blinkt
 
 clean :
 	rm -f blinkt *.o

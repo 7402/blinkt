@@ -2,7 +2,7 @@
 // blinkt.c
 // blinkt
 //
-// Copyright (C) 2018 Michael Budiansky. All rights reserved.
+// Copyright (C) 2022 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -51,18 +51,6 @@
 
 bool data_state;    // current state of data pin
 #endif
-
-// void gpio_result(int value);
-// void gpio_result(int value)
-// {
-// 	switch (value) {
-// 		case 0:				fprintf(stderr, "OK\n");			break;
-// 		case PI_BAD_GPIO:	fprintf(stderr, "PI_BAD_GPIO\n");	break;
-// 		case PI_BAD_MODE:	fprintf(stderr, "PI_BAD_MODE\n");	break;
-// 		case PI_BAD_LEVEL:	fprintf(stderr, "PI_BAD_LEVEL\n");	break;
-// 		default:			fprintf(stderr, "[%d]\n", value);	break;
-// 	}
-// }
 
 // intialize GPIO library and pins
 int pi = -1;
@@ -138,7 +126,18 @@ void read_state_file(const char *path, Flags *flags, Pixel pixels[NUM_PIXELS])
 {
     bool error = false;
     FILE *file = fopen(path, "r");
-
+    
+    if (file != NULL) {
+    	struct stat statbuf;
+    	error = stat(path, &statbuf) != 0;
+	
+    	if (!error && statbuf.st_size == 0) {
+        	init_state(flags, pixels);
+       		fclose(file);
+        	file = NULL;
+    	}
+    }    
+    
     if (file != NULL) {
         char line[LINE_SIZE];
         int k;
