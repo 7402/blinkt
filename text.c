@@ -31,7 +31,7 @@
 
 void version(void)
 {
-    printf("blinkt 0.3\n");
+    printf("blinkt 0.4\n");
 }
 
 void usage(void)
