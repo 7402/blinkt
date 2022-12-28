@@ -54,27 +54,44 @@ bool data_state;    // current state of data pin
 
 // intialize GPIO library and pins
 int pi = -1;
+bool daemon = false;
 
 void init_gpio(void)
 {
 #ifdef __linux__
-	pi = pigpio_start(NULL, NULL);
-    if (pi < 0) {
-    	fprintf(stderr, "unable to connect to pigpiod\n");
-    	exit(1);
-    }
-    
-    set_mode(pi, DAT, PI_OUTPUT);
-    set_mode(pi, CLK, PI_OUTPUT);
+    pi = pigpio_start(NULL, NULL);
+    if (pi >= 0) {
+        daemon = true;
 
-    gpio_write(pi, DAT, 0);
+    } else if (gpioInitialise() < 0) {
+        fprintf(stderr, "start pigpiod or use sudo\n");
+        exit(1);
+    }
+
+    if (daemon) {
+        set_mode(pi, DAT, PI_OUTPUT);
+        set_mode(pi, CLK, PI_OUTPUT);
+        gpio_write(pi, DAT, 0);
+
+    } else {
+        gpioSetMode(DAT, PI_OUTPUT);
+        gpioSetMode(CLK, PI_OUTPUT);
+
+        gpioWrite(DAT, 0);
+    }
+
     data_state = false;
 #endif
 }
 
 void close_gpio(void)
 {
-	pigpio_stop(pi);
+    if (daemon) {
+        pigpio_stop(pi);
+
+    } else {
+        gpioTerminate();
+    }
 }
 
 // initialize flags and pixels
@@ -126,18 +143,18 @@ void read_state_file(const char *path, Flags *flags, Pixel pixels[NUM_PIXELS])
 {
     bool error = false;
     FILE *file = fopen(path, "r");
-    
+
     if (file != NULL) {
-    	struct stat statbuf;
-    	error = stat(path, &statbuf) != 0;
-	
-    	if (!error && statbuf.st_size == 0) {
-        	init_state(flags, pixels);
-       		fclose(file);
-        	file = NULL;
-    	}
-    }    
-    
+        struct stat statbuf;
+        error = stat(path, &statbuf) != 0;
+
+        if (!error && statbuf.st_size == 0) {
+            init_state(flags, pixels);
+               fclose(file);
+            file = NULL;
+        }
+    }
+
     if (file != NULL) {
         char line[LINE_SIZE];
         int k;
@@ -332,9 +349,9 @@ void clear_pixels(Pixel pixels[NUM_PIXELS])
 void sleep_msec(int msec)
 {
 #ifdef __linux__
-	struct timespec ts;
-	ts.tv_sec = msec / 1000;
-	ts.tv_nsec = (msec % 1000) * 1000000L;
+    struct timespec ts;
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000L;
     nanosleep(&ts, NULL);
 #else
     usleep(1000L * msec);
@@ -350,12 +367,25 @@ void send_byte(uint8_t x)
         bool new_state = (x & 0b10000000) != 0;
         if (data_state != new_state) {
             // only send to data pin if value has changed
-            gpio_write(pi, DAT, new_state);
+            if (daemon) {
+                gpio_write(pi, DAT, new_state);
+
+            } else {
+                gpioWrite(DAT, new_state);
+            }
+
             data_state = new_state;
         }
 
-        gpio_write(pi, CLK, 1);
-        gpio_write(pi, CLK, 0);
+        if (daemon) {
+            gpio_write(pi, CLK, 1);
+            gpio_write(pi, CLK, 0);
+
+        } else {
+            gpioWrite(CLK, 1);
+            gpioWrite(CLK, 0);
+        }
+
         x = x << 1;
     }
 #endif
@@ -366,10 +396,24 @@ void send_clocks(int count)
 {
 #ifdef __linux__
     int i;
-    gpio_write(pi, DAT, 0);
+    if (daemon) {
+        gpio_write(pi, DAT, 0);
+
+    } else {
+        gpioWrite(DAT, 0);
+    }
+
+    data_state = 0;
+
     for (i = 0; i < count; i++) {
-        gpio_write(pi, CLK, 1);
-        gpio_write(pi, CLK, 0);
+        if (daemon) {
+            gpio_write(pi, CLK, 1);
+            gpio_write(pi, CLK, 0);
+
+        } else {
+            gpioWrite(CLK, 1);
+            gpioWrite(CLK, 0);
+        }
     }
 #endif
 }

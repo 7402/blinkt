@@ -55,10 +55,30 @@ git clone https://github.com/7402/blinkt.git
 cd blinkt
 make
 sudo make install
-sudo pigpiod
 ```
 
 ### Notes
+
+To run blinkt, either use sudo:
+
+```
+sudo blinkt
+```
+
+or start the pigpiod daemon:
+
+```
+sudo pigpiod
+blinkt
+```
+
+To auto-start pigpiod on boot:
+
+```
+sudo systemctl enable pigpiod
+```
+
+(The LEDs respond faster when not using the daemon.)
 
 If you are viewing your Blinkt! board upside-down from its standard orientation, i.e., the letters "BLINKT!" on the circuit board are upside down, type this command to adjust the numbering direction:
 ```
